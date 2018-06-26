@@ -83,6 +83,8 @@
 #endif
 #ifdef USE_CACHEDB
 #include "cachedb/cachedb.h"
+#include "netpas_http_mod/np_iterator.h"
+#include "netpas_http_mod/send_http_query.h"
 #endif
 #ifdef USE_IPSECMOD
 #include "ipsecmod/ipsecmod.h"
@@ -97,6 +99,9 @@ fptr_whitelist_comm_point(comm_point_callback_type *fptr)
 	if(fptr == &worker_handle_request) return 1;
 	else if(fptr == &outnet_udp_cb) return 1;
 	else if(fptr == &outnet_tcp_cb) return 1;
+#ifdef USE_CACHEDB
+	else if(fptr == &np_outnet_udp_cb) return 1;
+#endif
 	else if(fptr == &tube_handle_listen) return 1;
 	else if(fptr == &auth_xfer_probe_udp_callback) return 1;
 	else if(fptr == &auth_xfer_transfer_tcp_callback) return 1;
@@ -119,6 +124,9 @@ fptr_whitelist_comm_timer(void (*fptr)(void*))
 {
 	if(fptr == &pending_udp_timer_cb) return 1;
 	else if(fptr == &outnet_tcptimer) return 1;
+#ifdef USE_CACHEDB
+	else if(fptr == &np_pending_udp_timer_cb) return 1;
+#endif
 	else if(fptr == &pending_udp_timer_delay_cb) return 1;
 	else if(fptr == &worker_stat_timer_cb) return 1;
 	else if(fptr == &worker_probe_timer_cb) return 1;
@@ -173,6 +181,9 @@ int
 fptr_whitelist_pending_udp(comm_point_callback_type *fptr)
 {
 	if(fptr == &serviced_udp_callback) return 1;
+#ifdef USE_CACHEDB
+    else if(fptr == &np_serviced_udp_callback) return 1;
+#endif
 	else if(fptr == &worker_handle_reply) return 1;
 	else if(fptr == &libworker_handle_reply) return 1;
 	return 0;
@@ -374,6 +385,7 @@ fptr_whitelist_mod_init(int (*fptr)(struct module_env* env, int id))
 #endif
 #ifdef USE_CACHEDB
 	else if(fptr == &cachedb_init) return 1;
+	else if(fptr == &np_iter_init) return 1;
 #endif
 #ifdef USE_IPSECMOD
 	else if(fptr == &ipsecmod_init) return 1;
@@ -396,6 +408,7 @@ fptr_whitelist_mod_deinit(void (*fptr)(struct module_env* env, int id))
 #endif
 #ifdef USE_CACHEDB
 	else if(fptr == &cachedb_deinit) return 1;
+	else if(fptr == &np_iter_deinit) return 1;
 #endif
 #ifdef USE_IPSECMOD
 	else if(fptr == &ipsecmod_deinit) return 1;
@@ -419,6 +432,7 @@ fptr_whitelist_mod_operate(void (*fptr)(struct module_qstate* qstate,
 #endif
 #ifdef USE_CACHEDB
 	else if(fptr == &cachedb_operate) return 1;
+	else if(fptr == &np_iter_operate) return 1;
 #endif
 #ifdef USE_IPSECMOD
 	else if(fptr == &ipsecmod_operate) return 1;
@@ -442,6 +456,7 @@ fptr_whitelist_mod_inform_super(void (*fptr)(
 #endif
 #ifdef USE_CACHEDB
 	else if(fptr == &cachedb_inform_super) return 1;
+	else if(fptr == &np_iter_inform_super) return 1;
 #endif
 #ifdef USE_IPSECMOD
 	else if(fptr == &ipsecmod_inform_super) return 1;
@@ -465,6 +480,7 @@ fptr_whitelist_mod_clear(void (*fptr)(struct module_qstate* qstate,
 #endif
 #ifdef USE_CACHEDB
 	else if(fptr == &cachedb_clear) return 1;
+	else if(fptr == &np_iter_clear) return 1;
 #endif
 #ifdef USE_IPSECMOD
 	else if(fptr == &ipsecmod_clear) return 1;
@@ -487,6 +503,7 @@ fptr_whitelist_mod_get_mem(size_t (*fptr)(struct module_env* env, int id))
 #endif
 #ifdef USE_CACHEDB
 	else if(fptr == &cachedb_get_mem) return 1;
+	else if(fptr == &np_iter_get_mem) return 1;
 #endif
 #ifdef USE_IPSECMOD
 	else if(fptr == &ipsecmod_get_mem) return 1;

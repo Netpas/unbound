@@ -156,6 +156,8 @@ extern struct config_parser_state* cfg_parser;
 %token VAR_CACHEDB_REDISHOST VAR_CACHEDB_REDISPORT VAR_CACHEDB_REDISTIMEOUT
 %token VAR_UDP_UPSTREAM_WITHOUT_DOWNSTREAM VAR_FOR_UPSTREAM
 %token VAR_AUTH_ZONE VAR_ZONEFILE VAR_MASTER VAR_URL VAR_FOR_DOWNSTREAM
+%token VAR_NP_HTTP VAR_NP_HTTP_URL VAR_NP_HTTP_TIMEOUT VAR_NP_AUTH_DOMAIN VAR_NP_HTTP_TTL
+%token VAR_NP_POOL VAR_NP_THREADS_POOL_NUM
 %token VAR_FALLBACK_ENABLED VAR_ADDITIONAL_TLS_PORT VAR_LOW_RTT VAR_LOW_RTT_PERMIL
 %token VAR_ALLOW_NOTIFY
 
@@ -165,7 +167,8 @@ toplevelvar: serverstart contents_server | stubstart contents_stub |
 	forwardstart contents_forward | pythonstart contents_py | 
 	rcstart contents_rc | dtstart contents_dt | viewstart contents_view |
 	dnscstart contents_dnsc | cachedbstart contents_cachedb |
-	authstart contents_auth
+	authstart contents_auth | np_http_start  contents_np_http |
+	np_thpool_start contents_np_thpool |
 	;
 
 /* server: declaration */
@@ -2672,6 +2675,115 @@ redis_timeout: VAR_CACHEDB_REDISTIMEOUT STRING_ARG
 		OUTYY(("P(Compiled without cachedb or redis, ignoring)\n"));
 	#endif
 		free($2);
+	}
+	;
+np_thpool_start: VAR_NP_POOL
+	{
+	#if defined(USE_CACHEDB) && defined(USE_REDIS)
+		OUTYY(("\nP(netpas_pool:)\n"));
+	#else
+		OUTYY(("P(Compiled without netpas_http_mod, ignoring)\n"));
+	#endif
+	}
+	;
+contents_np_thpool: contents_np_thpool content_np_thpool
+	| ;
+content_np_thpool: np_threads_pool_num
+				 ;
+np_threads_pool_num: VAR_NP_THREADS_POOL_NUM STRING_ARG
+	{
+	#if defined(USE_CACHEDB) && defined(USE_REDIS)
+		OUTYY(("P(np_max_threads_num:%s)\n", $2));
+		if(cfg_parser->cfg->np_threads_pool_num)
+			yyerror("np_max_threads_num override, there must be one.");
+		if(atoi($2) == 0)
+			yyerror("np_max_threads_num value expected");
+		else cfg_parser->cfg->np_threads_pool_num = atoi($2);
+	#else
+		OUTYY(("P(Compiled without netpas_http, ignoring)\n"));
+	#endif
+		free($2);
+	}
+	;
+np_http_start: VAR_NP_HTTP
+	{
+		struct np_config_http *s;
+		OUTYY(("\nP(netpas_http:)\n"));
+		s = (struct np_config_http *)calloc(1, sizeof(struct np_config_http));
+		if(s) {
+			s->next = cfg_parser->cfg->np_http_param;
+			cfg_parser->cfg->np_http_param = s;
+		}
+		else
+		{
+			yyerror("out of memory");
+		}
+	}
+	;
+contents_np_http: contents_np_http content_np_http
+	| ;
+content_np_http: np_http_url | np_http_timeout | np_auth_domain | np_http_ttl
+	  ;
+np_http_url: VAR_NP_HTTP_URL STRING_ARG
+	{
+	#if defined(USE_CACHEDB) && defined(USE_REDIS)
+		OUTYY(("P(np_http_url:%s)\n", $2));
+		if(cfg_parser->cfg->np_http_param->np_http_url)
+			yyerror("np_http_param np_http_url override, there must be one "
+				"np_http_url for one np_http_parm");
+		free(cfg_parser->cfg->np_http_param->np_http_url);
+		cfg_parser->cfg->np_http_param->np_http_url = $2;
+	#else
+		OUTYY(("P(Compiled without netpas_http, ignoring)\n"));
+		free($2);
+	#endif
+	}
+	;
+np_http_timeout: VAR_NP_HTTP_TIMEOUT STRING_ARG
+	{
+	#if defined(USE_CACHEDB) && defined(USE_REDIS)
+		OUTYY(("P(np_http_timeout:%s)\n", $2));
+		if(cfg_parser->cfg->np_http_param->np_http_timeout)
+			yyerror("np_http_param np_http_timeout override, there must be one "
+				"np_http_timeot for one np_http_parm");
+		if(atoi($2) == 0)
+			yyerror("np_http_timeout timeout value expected");
+		else cfg_parser->cfg->np_http_param->np_http_timeout = atoi($2);
+	#else
+		OUTYY(("P(Compiled without netpas_http, ignoring)\n"));
+	#endif
+		free($2);
+	}
+	;
+np_http_ttl: VAR_NP_HTTP_TTL STRING_ARG
+	{
+	#if defined(USE_CACHEDB) && defined(USE_REDIS)
+		OUTYY(("P(np_http_timeout:%s)\n", $2));
+		if(cfg_parser->cfg->np_http_param->np_http_ttl)
+			yyerror("np_http_param np_http_timeout override, there must be one "
+				"np_http_timeot for one np_http_parm");
+		if(atoll($2) == 0)
+			yyerror("np_http_timeout timeout value expected");
+		else cfg_parser->cfg->np_http_param->np_http_ttl = atoll($2);
+	#else
+		OUTYY(("P(Compiled without netpas_http, ignoring)\n"));
+	#endif
+		free($2);
+	}
+	;
+np_auth_domain: VAR_NP_AUTH_DOMAIN STRING_ARG
+	{
+	#if defined(USE_CACHEDB) && defined(USE_REDIS)
+		OUTYY(("P(np_auth_domain:%s)\n", $2));
+		if(cfg_parser->cfg->np_http_param->np_auth_domain)
+			yyerror("np_http_param np_auth_domain override, there must be one "
+				"np_auth_domain for one np_http_parm");
+		free(cfg_parser->cfg->np_http_param->np_auth_domain);
+		cfg_parser->cfg->np_http_param->np_auth_domain = $2;
+	#else
+		OUTYY(("P(Compiled without netpas_http, ignoring)\n"));
+		free($2);
+	#endif
 	}
 	;
 %%

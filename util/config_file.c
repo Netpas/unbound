@@ -305,6 +305,7 @@ config_create(void)
 #ifdef USE_CACHEDB
 	cfg->cachedb_backend = NULL;
 	cfg->cachedb_secret = NULL;
+    cfg->np_threads_pool_num = 0;
 #endif
 	return cfg;
 error_exit:
@@ -1285,6 +1286,26 @@ config_del_strbytelist(struct config_strbytelist* p)
 		p = np;
 	}
 }
+static void
+config_del_http_param(struct np_config_http *np_http)
+{
+    struct np_config_http *ptr = np_http;
+    struct np_config_http *tmp;
+
+    while(ptr) {
+        if(ptr->np_http_url != NULL) {
+            free(ptr->np_http_url);
+        }
+        if(ptr->np_auth_domain != NULL) {
+            free(ptr->np_auth_domain);
+        }
+        tmp = ptr->next;
+        if(ptr != NULL) {
+            free(ptr);
+        }
+        ptr = tmp;
+    }
+}
 
 void 
 config_delete(struct config_file* cfg)
@@ -1358,6 +1379,7 @@ config_delete(struct config_file* cfg)
 #ifdef USE_CACHEDB
 	free(cfg->cachedb_backend);
 	free(cfg->cachedb_secret);
+    config_del_http_param(cfg->np_http_param);
 #endif
 	free(cfg);
 }

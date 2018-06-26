@@ -52,6 +52,7 @@ struct module_qstate;
 struct sock_list;
 struct ub_packed_rrset_key;
 struct regional;
+struct np_config_http;
 
 /**
  * The configuration options.
@@ -522,6 +523,9 @@ struct config_file {
 	int redis_server_port;
 	/** timeout (in ms) for communication with the redis server */
 	int redis_timeout;
+    /* netpas http module*/
+    struct np_config_http *np_http_param;
+    int np_threads_pool_num;
 #endif
 #endif
 };
@@ -533,6 +537,16 @@ extern gid_t cfg_gid;
 /** debug and enable small timeouts */
 extern int autr_permit_small_holddown;
 
+/**
+ * http config options
+ */
+struct np_config_http {
+    struct np_config_http *next;
+    char *np_http_url;
+    char *np_auth_domain;
+    int np_http_timeout;
+    uint64_t np_http_ttl;
+};
 /**
  * Stub config options
  */

@@ -53,6 +53,7 @@
 #endif
 #ifdef USE_CACHEDB
 #include "cachedb/cachedb.h"
+#include "netpas_http_mod/np_iterator.h"
 #endif
 #ifdef USE_IPSECMOD
 #include "ipsecmod/ipsecmod.h"
@@ -133,6 +134,7 @@ module_list_avail(void)
 #endif
 #ifdef USE_CACHEDB
 		"cachedb",
+        "netpas_http_mod",
 #endif
 #ifdef USE_IPSECMOD
 		"ipsecmod",
@@ -161,6 +163,7 @@ module_funcs_avail(void)
 #endif
 #ifdef USE_CACHEDB
 		&cachedb_get_funcblock,
+        &np_iter_get_funcblock,
 #endif
 #ifdef USE_IPSECMOD
 		&ipsecmod_get_funcblock,
