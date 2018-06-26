@@ -459,6 +459,13 @@ redis-server-host{COLON}	{ YDVAR(1, VAR_CACHEDB_REDISHOST) }
 redis-server-port{COLON}	{ YDVAR(1, VAR_CACHEDB_REDISPORT) }
 redis-timeout{COLON}		{ YDVAR(1, VAR_CACHEDB_REDISTIMEOUT) }
 udp-upstream-without-downstream{COLON} { YDVAR(1, VAR_UDP_UPSTREAM_WITHOUT_DOWNSTREAM) }
+netpas-http{COLON}			{ YDVAR(0, VAR_NP_HTTP) }
+np-http-url{COLON}	{ YDVAR(1, VAR_NP_HTTP_URL) }
+np-http-timeout{COLON}	{ YDVAR(1, VAR_NP_HTTP_TIMEOUT) }
+np-auth-domain{COLON}		{ YDVAR(1, VAR_NP_AUTH_DOMAIN) }
+np-http-ttl{COLON}	{ YDVAR(1, VAR_NP_HTTP_TTL) }
+netpas-pool{COLON}			{ YDVAR(0, VAR_NP_POOL) }
+np-threads-pool-num{COLON}  { YDVAR(1, VAR_NP_THREADS_POOL_NUM) }
 <INITIAL,val>{NEWLINE}		{ LEXOUT(("NL\n")); cfg_parser->line++; }
 
 	/* Quoted strings. Strip leading and ending quotes */

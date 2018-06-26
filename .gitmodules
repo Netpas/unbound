@@ -1,0 +1,6 @@
+[submodule "netpas_http_mod/C-Thread-Pool"]
+	path = netpas_http_mod/C-Thread-Pool
+	url = https://github.com/Pithikos/C-Thread-Pool.git
+[submodule "netpas_http_mod/cJSON"]
+	path = netpas_http_mod/cJSON
+	url = https://github.com/DaveGamble/cJSON.git
