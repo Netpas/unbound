@@ -1,5 +1,5 @@
 ### netpas_http_mod 模块
-这是基于Unbound程序实现的一个模块，此模块必须和redis模块配合使用。模块提供权威域的 TXT 域的查询，然后将查询内容进行后端进行查询，将查询到的IP地址的相关IPINFO信息，封装到TXT域中返回。
+这是基于Unbound程序实现的一个模块,模块提供权威域的 TXT 域的查询，然后将查询内容进行后端进行查询，将查询到的IP地址的相关IPINFO信息，封装到TXT域中返回。
 
 ### 模块编译
 ```
@@ -14,7 +14,9 @@ make install
 * expat-devel
 * openssl-devel
 * libcurl-devel(netpas_http_mod所依赖的库)
+```
 libcurl编译注意:dns 解析库用Linux自带的有问题，和Unbound冲突，应该使用c-ares异步解析库。
+```
 
 unbound 解析配置文件工具:
 * byacc
